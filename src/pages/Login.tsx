@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import Logo from '../components/Logo';
+import CTLogo from '../components/CTLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 const Login = () => {
@@ -25,61 +25,59 @@ const Login = () => {
     });
 
     if (error) {
-      toast.error("Erro ao entrar: " + error.message);
+      toast.error("Erro de autenticação: " + error.message);
     } else {
-      toast.success("Bem-vindo ao TechFlow IF!");
+      toast.success("Acesso autorizado.");
       navigate('/upload');
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Efeito de brilho no fundo */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-[120px]" />
-
-      <Logo className="mb-8" />
-      
-      <Card className="w-full max-w-md bg-slate-900/50 border-slate-800 backdrop-blur-xl shadow-2xl">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-white text-center">Acesso ao Portal</CardTitle>
-          <CardDescription className="text-slate-400 text-center">
-            Entre com suas credenciais acadêmicas
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="email"
-                placeholder="seu.email@if.edu.br"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-950 border-slate-800 text-white focus-visible:ring-emerald-500"
-                required
-              />
+    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-4 font-sans">
+      <div className="w-full max-w-md">
+        <CTLogo />
+        
+        <Card className="bg-zinc-900/30 border-[#00FF41]/30 border-2 backdrop-blur-md shadow-[0_0_40px_rgba(0,255,65,0.05)] overflow-hidden">
+          <CardContent className="p-8 pt-10">
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-xs font-mono text-zinc-500 uppercase tracking-widest ml-1">Identificação</label>
+                <Input
+                  type="email"
+                  placeholder="usuario@instituto.edu.br"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-mono text-zinc-500 uppercase tracking-widest ml-1">Chave de Acesso</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full mt-4"
+                disabled={loading}
+              >
+                {loading ? "PROCESSANDO..." : "INICIAR SESSÃO"}
+              </Button>
+            </form>
+            
+            <div className="mt-8 text-center">
+              <p className="text-zinc-600 text-[10px] font-mono uppercase tracking-tighter">
+                Sistema de Fluxo Tecnológico v1.0.4
+              </p>
             </div>
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-slate-950 border-slate-800 text-white focus-visible:ring-emerald-500"
-                required
-              />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-              disabled={loading}
-            >
-              {loading ? "Carregando..." : "Entrar"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
