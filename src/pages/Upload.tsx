@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import Logo from '../components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload as UploadIcon, FileText, LogOut, CheckCircle2, CloudUpload, Zap } from 'lucide-react';
+import { Upload as UploadIcon, FileText, LogOut, CheckCircle2, UploadCloud, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Upload = () => {
@@ -64,7 +64,6 @@ const Upload = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-zinc-300 p-6 relative overflow-hidden">
-      {/* Background Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-[#00FF41]/5 blur-[120px] rounded-full opacity-50" />
 
       <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-10">
@@ -95,7 +94,7 @@ const Upload = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl text-white flex items-center gap-3">
                   <div className="p-2 bg-[#00FF41]/10 rounded-lg">
-                    <CloudUpload className="text-[#00FF41]" size={20} />
+                    <UploadCloud className="text-[#00FF41]" size={20} />
                   </div>
                   Upload de Documentação
                 </CardTitle>
