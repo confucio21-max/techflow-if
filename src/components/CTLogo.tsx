@@ -3,14 +3,23 @@ import { Atom } from 'lucide-react';
 
 const CTLogo = () => {
   return (
-    <div className="flex flex-col items-center gap-3 mb-6">
+    <div className="flex flex-col items-center gap-4">
       <div className="relative">
-        <div className="absolute inset-0 bg-[#00FF41] blur-xl opacity-20 animate-pulse" />
-        <Atom size={64} className="text-[#00FF41] relative z-10" strokeWidth={1.5} />
+        {/* Outer Glow */}
+        <div className="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 animate-pulse" />
+        
+        {/* Icon Container */}
+        <div className="relative z-10 p-4 bg-zinc-900/50 rounded-2xl border border-emerald-500/20 backdrop-blur-sm">
+          <Atom size={48} className="text-emerald-400" strokeWidth={1.5} />
+        </div>
       </div>
-      <h2 className="text-[#00FF41] font-mono text-xl tracking-[0.2em] font-bold">
-        C&T PORTAL
-      </h2>
+      
+      <div className="text-center space-y-1">
+        <h2 className="text-emerald-400 font-mono text-2xl tracking-[0.3em] font-bold">
+          C&T PORTAL
+        </h2>
+        <div className="h-[1px] w-12 bg-emerald-500/30 mx-auto" />
+      </div>
     </div>
   );
 };
