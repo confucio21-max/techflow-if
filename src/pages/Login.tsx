@@ -36,7 +36,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#020202] relative overflow-hidden font-sans">
+    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-[#020202] overflow-hidden">
       {/* Background High-Tech Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black" />
       
@@ -56,7 +56,7 @@ const Login = () => {
           <CTLogo />
         </div>
         
-        <Card className="bg-zinc-950/40 border-emerald-500/20 border backdrop-blur-xl shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)] relative overflow-hidden">
+        <Card className="bg-zinc-950/60 border-emerald-500/30 border backdrop-blur-xl shadow-[0_0_50px_-12px_rgba(16,185,129,0.3)] relative overflow-hidden">
           {/* Top Accent Line */}
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
           
