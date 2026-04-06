@@ -64,11 +64,10 @@ const Upload = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-zinc-300 p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-[#00FF41]/5 blur-[120px] rounded-full opacity-50" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-emerald-500/5 blur-[120px] rounded-full opacity-50" />
 
-      <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-10">
-        <Logo />
-        <div className="flex items-center gap-4">
+      <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 mb-16 relative z-10 border-b border-zinc-800/50 pb-8">
+        <div className="flex-1 flex justify-start">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/explore')}
@@ -76,7 +75,14 @@ const Upload = () => {
           >
             <Search className="mr-2 h-4 w-4" /> Explorar Arquivos
           </Button>
-          <div className="hidden md:flex flex-col items-end mr-4">
+        </div>
+        
+        <div className="flex-1 flex justify-center">
+          <Logo />
+        </div>
+        
+        <div className="flex-1 flex items-center justify-end gap-6">
+          <div className="hidden lg:flex flex-col items-end">
             <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Operador Ativo</span>
             <span className="text-xs text-zinc-300">{user?.email}</span>
           </div>
@@ -100,13 +106,13 @@ const Upload = () => {
             <CardHeader className="border-b border-zinc-800/50 pb-8">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl text-white flex items-center gap-3">
-                  <div className="p-2 bg-[#00FF41]/10 rounded-lg">
-                    <UploadCloud className="text-[#00FF41]" size={20} />
+                  <div className="p-2 bg-emerald-500/10 rounded-lg">
+                    <UploadCloud className="text-emerald-500" size={20} />
                   </div>
                   Upload de Documentação
                 </CardTitle>
                 <div className="flex items-center gap-2 px-3 py-1 bg-zinc-950 rounded-full border border-zinc-800">
-                  <Zap size={12} className="text-[#00FF41]" />
+                  <Zap size={12} className="text-emerald-500" />
                   <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">Fast Sync</span>
                 </div>
               </div>
@@ -116,8 +122,8 @@ const Upload = () => {
               <div 
                 className={`group relative border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-500 ${
                   file 
-                    ? 'border-[#00FF41] bg-[#00FF41]/5' 
-                    : 'border-zinc-800 hover:border-[#00FF41]/40 hover:bg-zinc-900/50'
+                    ? 'border-emerald-500 bg-emerald-500/5' 
+                    : 'border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/50'
                 }`}
               >
                 <input
@@ -137,8 +143,8 @@ const Upload = () => {
                         exit={{ scale: 0.8, opacity: 0 }}
                         className="flex flex-col items-center"
                       >
-                        <div className="w-16 h-16 bg-[#00FF41]/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,255,65,0.2)]">
-                          <CheckCircle2 className="h-8 w-8 text-[#00FF41]" />
+                        <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                          <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                         </div>
                         <span className="text-white font-medium text-lg mb-1">{file.name}</span>
                         <span className="text-zinc-500 text-sm font-mono uppercase tracking-widest">Pronto para transmissão</span>
@@ -150,8 +156,8 @@ const Upload = () => {
                         animate={{ opacity: 1 }}
                         className="flex flex-col items-center"
                       >
-                        <div className="w-16 h-16 bg-zinc-950 rounded-full flex items-center justify-center mb-4 border border-zinc-800 group-hover:border-[#00FF41]/50 transition-colors">
-                          <FileText className="h-8 w-8 text-zinc-600 group-hover:text-[#00FF41]/70 transition-colors" />
+                        <div className="w-16 h-16 bg-zinc-950 rounded-full flex items-center justify-center mb-4 border border-zinc-800 group-hover:border-emerald-500/50 transition-colors">
+                          <FileText className="h-8 w-8 text-zinc-600 group-hover:text-emerald-500/70 transition-colors" />
                         </div>
                         <span className="text-zinc-300 font-medium text-lg">Arraste seu PDF aqui</span>
                         <span className="text-zinc-500 text-sm mt-2 font-mono uppercase tracking-widest">Limite: 50MB por arquivo</span>
@@ -165,7 +171,7 @@ const Upload = () => {
                 <Button 
                   onClick={handleUpload}
                   disabled={!file || uploading}
-                  className="w-full h-14 bg-[#00FF41] text-black hover:bg-[#00FF41]/90 hover:shadow-[0_0_30px_rgba(0,255,65,0.3)] transition-all duration-300 font-bold text-base tracking-widest disabled:opacity-20"
+                  className="w-full h-14 bg-emerald-500 text-black hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all duration-300 font-bold text-base tracking-widest disabled:opacity-20"
                 >
                   {uploading ? (
                     <div className="flex items-center gap-3">
