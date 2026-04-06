@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import Logo from '../components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload as UploadIcon, FileText, LogOut, CheckCircle2, UploadCloud, Zap } from 'lucide-react';
+import { Upload as UploadIcon, FileText, LogOut, CheckCircle2, UploadCloud, Zap, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Upload = () => {
@@ -69,6 +69,13 @@ const Upload = () => {
       <header className="max-w-6xl mx-auto flex justify-between items-center mb-16 relative z-10">
         <Logo />
         <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/explore')}
+            className="text-zinc-400 hover:text-emerald-400 hover:bg-emerald-500/5"
+          >
+            <Search className="mr-2 h-4 w-4" /> Explorar Arquivos
+          </Button>
           <div className="hidden md:flex flex-col items-end mr-4">
             <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Operador Ativo</span>
             <span className="text-xs text-zinc-300">{user?.email}</span>

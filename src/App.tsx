@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Upload from './pages/Upload';
+import Explore from './pages/Explore';
 import { Toaster } from 'sonner';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/upload" element={<Upload />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
         <Toaster theme="dark" position="top-center" />
