@@ -25,6 +25,45 @@ const Upload = () => {
     checkUser();
   }, [navigate]);
 
+  const sendTelegramNotification = async (fileName: string) => {
+    try {
+      // 1. Buscar configurações do Telegram
+      const { data: config, error: configError } = await supabase
+        .from('telegram_config')
+        .select('bot_token, chat_id')
+        .single();
+
+      if (configError || !config) {
+        console.error("Erro ao carregar configuração do Telegram:", configError);
+        return;
+      }
+
+      // 2. Disparar mensagem via API do Telegram
+      const message = `📁 TECHFLOW VAULT | Novo arquivo detectado: ${fileName}. Autor: Dante Dias Monteiro`;
+      const telegramUrl = `https://api.telegram.org/bot${config.bot_token}/sendMessage`;
+
+      await fetch(telegramUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: config.chat_id,
+          text: message,
+          parse_mode: 'Markdown'
+        })
+      });
+
+      // 3. Atualizar status na tabela techflow_storage (opcional, mas bom para o ícone brilhar)
+      await supabase
+        .from('techflow_storage')
+        .update({ telegram_sent: true })
+        .eq('name', fileName)
+        .eq('user_id', user.id);
+
+    } catch (err) {
+      console.error("Falha na notificação do Telegram:", err);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -68,6 +107,10 @@ const Upload = () => {
       toast.error("Erro ao registrar metadados");
     } else {
       toast.success("Sincronização concluída com sucesso");
+      
+      // 3. Disparar notificação do Telegram em segundo plano
+      sendTelegramNotification(file.name);
+      
       setTimeout(() => navigate('/drive'), 1000);
     }
     setUploading(false);
