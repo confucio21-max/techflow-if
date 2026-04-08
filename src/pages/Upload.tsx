@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import Logo from '../components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload as UploadIcon, FileText, LogOut, CheckCircle2, UploadCloud, Zap, ArrowLeft } from 'lucide-react';
+import { UploadCloud, FileText, LogOut, CheckCircle2, ArrowLeft, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Upload = () => {
@@ -45,7 +45,7 @@ const Upload = () => {
       .upload(filePath, file);
 
     if (uploadError) {
-      toast.error("Erro na transmissão: " + uploadError.message);
+      toast.error("Falha na transmissão de dados");
       setUploading(false);
       return;
     }
@@ -59,81 +59,80 @@ const Upload = () => {
           size: file.size,
           type: file.type || 'application/octet-stream',
           path: filePath,
-          user_id: user.id
+          user_id: user.id,
+          telegram_sent: false
         }
       ]);
 
     if (dbError) {
-      toast.error("Erro ao registrar arquivo: " + dbError.message);
+      toast.error("Erro ao registrar metadados");
     } else {
-      toast.success("Arquivo sincronizado com sucesso!");
-      setTimeout(() => navigate('/drive'), 1500);
+      toast.success("Sincronização concluída com sucesso");
+      setTimeout(() => navigate('/drive'), 1000);
     }
     setUploading(false);
   };
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-zinc-300 p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-emerald-500/5 blur-[120px] rounded-full opacity-50" />
-
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#00FF9905_1px,transparent_1px),linear-gradient(to_bottom,#00FF9905_1px,transparent_1px)] bg-[size:60px_60px]" />
+      
       <header className="max-w-7xl mx-auto flex justify-between items-center mb-16 relative z-10">
         <div className="flex items-center gap-6">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/drive')}
-            className="text-zinc-400 hover:text-emerald-400"
+            className="text-zinc-500 hover:text-[#00FF99] hover:bg-[#00FF99]/5"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Drive
+            <ArrowLeft className="mr-2 h-4 w-4" /> BACK TO NODE
           </Button>
           <Logo />
         </div>
         <Button 
           variant="outline" 
           onClick={() => supabase.auth.signOut().then(() => navigate('/login'))} 
-          className="border-zinc-800 hover:border-red-500/50 hover:text-red-500"
+          className="border-zinc-800 hover:border-red-500/50 hover:text-red-500 font-mono text-[10px] tracking-widest"
         >
-          <LogOut className="mr-2 h-4 w-4" /> Sair
+          <LogOut className="mr-2 h-3 w-3" /> TERMINATE SESSION
         </Button>
       </header>
 
-      <main className="max-w-3xl mx-auto relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="bg-zinc-900/30 border-zinc-800/50 backdrop-blur-xl shadow-2xl overflow-hidden">
-            <CardHeader className="border-b border-zinc-800/50 pb-8">
-              <CardTitle className="text-xl text-white flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/10 rounded-lg">
-                  <UploadCloud className="text-emerald-500" size={20} />
-                </div>
-                Transmissão de Dados
+      <main className="max-w-2xl mx-auto relative z-10">
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+          <Card className="bg-black/60 border-[#00FF99]/20 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,255,153,0.05)]">
+            <CardHeader className="border-b border-[#00FF99]/10 pb-8">
+              <CardTitle className="text-lg text-white font-mono tracking-[0.2em] flex items-center gap-3">
+                <Zap className="text-[#00FF99]" size={18} />
+                DATA UPLOAD PROTOCOL
               </CardTitle>
             </CardHeader>
             
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-10 space-y-8">
               <div 
-                className={`group relative border-2 border-dashed rounded-2xl p-16 text-center transition-all duration-500 ${
-                  file ? 'border-emerald-500 bg-emerald-500/5' : 'border-zinc-800 hover:border-emerald-500/40'
+                className={`group relative border-2 border-dashed rounded-3xl p-20 text-center transition-all duration-700 ${
+                  file ? 'border-[#00FF99] bg-[#00FF99]/5 shadow-[0_0_30px_rgba(0,255,153,0.1)]' : 'border-zinc-800 hover:border-[#00FF99]/40'
                 }`}
               >
                 <input type="file" id="file-upload" className="hidden" onChange={handleFileChange} />
                 <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center">
                   <AnimatePresence mode="wait">
                     {file ? (
-                      <motion.div key="file" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                        <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-4">
-                          <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                      <motion.div key="file" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+                        <div className="w-20 h-20 bg-[#00FF99]/10 rounded-2xl flex items-center justify-center mb-6 border border-[#00FF99]/30">
+                          <CheckCircle2 className="h-10 w-10 text-[#00FF99]" />
                         </div>
-                        <span className="text-white font-medium text-lg block">{file.name}</span>
-                        <span className="text-zinc-500 text-xs font-mono uppercase tracking-widest">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB detectados
+                        <span className="text-white font-mono text-sm block mb-2">{file.name}</span>
+                        <span className="text-[#00FF99]/60 text-[10px] font-mono uppercase tracking-[0.3em]">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB READY
                         </span>
                       </motion.div>
                     ) : (
                       <div className="flex flex-col items-center">
-                        <div className="w-16 h-16 bg-zinc-950 rounded-full flex items-center justify-center mb-4 border border-zinc-800">
-                          <FileText className="h-8 w-8 text-zinc-600" />
+                        <div className="w-20 h-20 bg-zinc-900/50 rounded-2xl flex items-center justify-center mb-6 border border-zinc-800 group-hover:border-[#00FF99]/30 transition-all">
+                          <FileText className="h-10 w-10 text-zinc-700 group-hover:text-[#00FF99]/50" />
                         </div>
-                        <span className="text-zinc-300 font-medium text-lg">Arraste qualquer arquivo</span>
-                        <span className="text-zinc-500 text-sm mt-2 font-mono uppercase tracking-widest">Criptografia de ponta a ponta</span>
+                        <span className="text-zinc-400 font-mono text-xs uppercase tracking-[0.2em]">Inject Data Stream</span>
+                        <span className="text-zinc-600 text-[9px] mt-3 font-mono uppercase tracking-widest">AES-256 Encryption Enabled</span>
                       </div>
                     )}
                   </AnimatePresence>
@@ -143,9 +142,9 @@ const Upload = () => {
               <Button 
                 onClick={handleUpload}
                 disabled={!file || uploading}
-                className="w-full h-14 bg-emerald-500 text-black hover:bg-emerald-400 font-bold tracking-widest"
+                className="w-full h-16 bg-[#00FF99] text-black hover:bg-[#00FF99]/80 font-bold tracking-[0.3em] text-xs shadow-[0_0_25px_rgba(0,255,153,0.2)] border-none"
               >
-                {uploading ? "SINCRONIZANDO..." : "INICIAR TRANSMISSÃO"}
+                {uploading ? "SYNCHRONIZING..." : "EXECUTE TRANSMISSION"}
               </Button>
             </CardContent>
           </Card>
