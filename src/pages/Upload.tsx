@@ -29,7 +29,6 @@ const Upload = () => {
     try {
       console.log("Iniciando busca de configuração do Telegram...");
       
-      // 1. Buscar configurações do Telegram
       const { data: config, error: configError } = await supabase
         .from('telegram_config')
         .select('bot_token, chat_id')
@@ -37,15 +36,12 @@ const Upload = () => {
 
       if (configError || !config) {
         console.error("ERRO AO BUSCAR CONFIG TELEGRAM:", configError);
-        toast.error("Erro ao carregar configurações do Telegram");
         return;
       }
 
-      // LOGS DE DEPURAÇÃO SOLICITADOS
       console.log("DEBUG - Telegram Token:", config.bot_token);
       console.log("DEBUG - Telegram Chat ID:", config.chat_id);
 
-      // 2. Disparar mensagem via API do Telegram
       const message = `📁 TECHFLOW VAULT | Novo arquivo detectado: ${fileName}. Autor: Dante Dias Monteiro`;
       const telegramUrl = `https://api.telegram.org/bot${config.bot_token}/sendMessage`;
 
@@ -65,7 +61,6 @@ const Upload = () => {
 
       if (response.ok) {
         console.log("Notificação enviada com sucesso!");
-        // 3. Atualizar status na tabela techflow_storage
         await supabase
           .from('techflow_storage')
           .update({ telegram_sent: true })
@@ -87,13 +82,15 @@ const Upload = () => {
 
   const handleUpload = async () => {
     if (!file || !user) return;
+    
+    console.log('Iniciando Upload...');
     setUploading(true);
 
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
-    console.log("Iniciando upload para o bucket trabalhos-arquivos...");
+    console.log(`Tentando upload para o bucket trabalhos-arquivos no caminho: ${filePath}`);
 
     // 1. Upload para o Storage
     const { error: uploadError } = await supabase.storage
@@ -101,14 +98,13 @@ const Upload = () => {
       .upload(filePath, file);
 
     if (uploadError) {
-      // LOG DO ERRO REAL DO STORAGE
-      console.error("DETALHES DO ERRO DE UPLOAD (STORAGE):", uploadError);
+      console.error('ERRO REAL NO STORAGE:', uploadError);
       toast.error(`Falha na transmissão: ${uploadError.message}`);
       setUploading(false);
       return;
     }
 
-    console.log("Upload concluído. Registrando metadados...");
+    console.log('Upload OK, chamando Telegram...');
 
     // 2. Salvar metadados na techflow_storage
     const { data: insertData, error: dbError } = await supabase
@@ -131,7 +127,6 @@ const Upload = () => {
     } else {
       toast.success("Sincronização concluída com sucesso");
       
-      // 3. Disparar notificação do Telegram
       if (insertData && insertData[0]) {
         console.log("Disparando notificação para o arquivo ID:", insertData[0].id);
         sendTelegramNotification(file.name, insertData[0].id);
