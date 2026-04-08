@@ -25,7 +25,7 @@ const Upload = () => {
     checkUser();
   }, [navigate]);
 
-  const sendTelegramNotification = async (fileName: string) => {
+  const sendTelegramNotification = async (fileName: string, fileId: string) => {
     try {
       // 1. Buscar configurações do Telegram
       const { data: config, error: configError } = await supabase
@@ -42,7 +42,7 @@ const Upload = () => {
       const message = `📁 TECHFLOW VAULT | Novo arquivo detectado: ${fileName}. Autor: Dante Dias Monteiro`;
       const telegramUrl = `https://api.telegram.org/bot${config.bot_token}/sendMessage`;
 
-      await fetch(telegramUrl, {
+      const response = await fetch(telegramUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,12 +52,13 @@ const Upload = () => {
         })
       });
 
-      // 3. Atualizar status na tabela techflow_storage (opcional, mas bom para o ícone brilhar)
-      await supabase
-        .from('techflow_storage')
-        .update({ telegram_sent: true })
-        .eq('name', fileName)
-        .eq('user_id', user.id);
+      if (response.ok) {
+        // 3. Atualizar status na tabela techflow_storage usando o ID único
+        await supabase
+          .from('techflow_storage')
+          .update({ telegram_sent: true })
+          .eq('id', fileId);
+      }
 
     } catch (err) {
       console.error("Falha na notificação do Telegram:", err);
@@ -89,8 +90,8 @@ const Upload = () => {
       return;
     }
 
-    // 2. Salvar metadados na techflow_storage
-    const { error: dbError } = await supabase
+    // 2. Salvar metadados na techflow_storage e obter o ID inserido
+    const { data: insertData, error: dbError } = await supabase
       .from('techflow_storage')
       .insert([
         {
@@ -101,15 +102,18 @@ const Upload = () => {
           user_id: user.id,
           telegram_sent: false
         }
-      ]);
+      ])
+      .select();
 
     if (dbError) {
       toast.error("Erro ao registrar metadados");
     } else {
       toast.success("Sincronização concluída com sucesso");
       
-      // 3. Disparar notificação do Telegram em segundo plano
-      sendTelegramNotification(file.name);
+      // 3. Disparar notificação do Telegram se o registro foi criado
+      if (insertData && insertData[0]) {
+        sendTelegramNotification(file.name, insertData[0].id);
+      }
       
       setTimeout(() => navigate('/drive'), 1000);
     }
