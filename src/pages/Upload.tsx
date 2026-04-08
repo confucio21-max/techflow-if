@@ -18,34 +18,37 @@ const Upload = () => {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) navigate('/login');
-      setUser(user);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          alert("ERRO AUTH: " + JSON.stringify(error));
+          navigate('/login');
+          return;
+        }
+        if (!user) navigate('/login');
+        setUser(user);
+      } catch (e) {
+        alert("FALHA CRÍTICA AO CHECAR USUÁRIO: " + e);
+      }
     };
     checkUser();
   }, [navigate]);
 
   const sendTelegramNotification = async (fileName: string, fileId: string) => {
     try {
-      console.log("Iniciando busca de configuração do Telegram...");
-      
       const { data: config, error: configError } = await supabase
         .from('telegram_config')
         .select('bot_token, chat_id')
         .single();
 
-      if (configError || !config) {
-        console.error("ERRO AO BUSCAR CONFIG TELEGRAM:", configError);
+      if (configError) {
+        alert("ERRO AO BUSCAR CONFIG TELEGRAM: " + JSON.stringify(configError));
         return;
       }
-
-      console.log("DEBUG - Telegram Token:", config.bot_token);
-      console.log("DEBUG - Telegram Chat ID:", config.chat_id);
 
       const message = `📁 TECHFLOW VAULT | Novo arquivo detectado: ${fileName}. Autor: Dante Dias Monteiro`;
       const telegramUrl = `https://api.telegram.org/bot${config.bot_token}/sendMessage`;
 
-      console.log("Enviando requisição para o Telegram...");
       const response = await fetch(telegramUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,21 +59,18 @@ const Upload = () => {
         })
       });
 
-      const responseData = await response.json();
-      console.log("RESPOSTA API TELEGRAM:", responseData);
-
       if (response.ok) {
-        console.log("Notificação enviada com sucesso!");
         await supabase
           .from('techflow_storage')
           .update({ telegram_sent: true })
           .eq('id', fileId);
       } else {
-        console.error("FALHA NO ENVIO TELEGRAM:", responseData);
+        const errData = await response.json();
+        alert("FALHA API TELEGRAM: " + JSON.stringify(errData));
       }
 
     } catch (err) {
-      console.error("ERRO CRÍTICO NO PROCESSO TELEGRAM:", err);
+      alert("ERRO EXCEPTION TELEGRAM: " + err);
     }
   };
 
@@ -81,60 +81,70 @@ const Upload = () => {
   };
 
   const handleUpload = async () => {
-    if (!file || !user) return;
-    
     console.log('Iniciando Upload...');
+    if (!file) {
+      alert("Nenhum arquivo selecionado.");
+      return;
+    }
+    if (!user) {
+      alert("Usuário não autenticado.");
+      return;
+    }
+    
     setUploading(true);
 
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
-    console.log(`Tentando upload para o bucket trabalhos-arquivos no caminho: ${filePath}`);
+    // NOME DO BUCKET: trabalhos-arquivos (verifique se no Supabase está exatamente assim)
+    const BUCKET_NAME = 'trabalhos-arquivos';
 
-    // 1. Upload para o Storage
-    const { error: uploadError } = await supabase.storage
-      .from('trabalhos-arquivos')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      console.error('ERRO REAL NO STORAGE:', uploadError);
-      toast.error(`Falha na transmissão: ${uploadError.message}`);
-      setUploading(false);
-      return;
-    }
-
-    console.log('Upload OK, chamando Telegram...');
-
-    // 2. Salvar metadados na techflow_storage
-    const { data: insertData, error: dbError } = await supabase
-      .from('techflow_storage')
-      .insert([
-        {
-          name: file.name,
-          size: file.size,
-          type: file.type || 'application/octet-stream',
-          path: filePath,
-          user_id: user.id,
-          telegram_sent: false
-        }
-      ])
-      .select();
-
-    if (dbError) {
-      console.error("ERRO AO INSERIR NA TABELA TECHFLOW_STORAGE:", dbError);
-      toast.error("Erro ao registrar metadados");
-    } else {
-      toast.success("Sincronização concluída com sucesso");
+    try {
+      console.log(`Tentando upload para o bucket ${BUCKET_NAME}...`);
       
-      if (insertData && insertData[0]) {
-        console.log("Disparando notificação para o arquivo ID:", insertData[0].id);
-        sendTelegramNotification(file.name, insertData[0].id);
+      // 1. Upload para o Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(filePath, file);
+
+      if (uploadError) {
+        alert("ERRO REAL STORAGE (SUPABASE): " + JSON.stringify(uploadError));
+        setUploading(false);
+        return;
       }
-      
-      setTimeout(() => navigate('/drive'), 1500);
+
+      console.log('Upload OK, chamando Telegram...');
+
+      // 2. Salvar metadados na techflow_storage
+      const { data: insertData, error: dbError } = await supabase
+        .from('techflow_storage')
+        .insert([
+          {
+            name: file.name,
+            size: file.size,
+            type: file.type || 'application/octet-stream',
+            path: filePath,
+            user_id: user.id,
+            telegram_sent: false
+          }
+        ])
+        .select();
+
+      if (dbError) {
+        alert("ERRO AO INSERIR NA TABELA (DB): " + JSON.stringify(dbError));
+      } else {
+        toast.success("Sincronização concluída");
+        if (insertData && insertData[0]) {
+          sendTelegramNotification(file.name, insertData[0].id);
+        }
+        setTimeout(() => navigate('/drive'), 1500);
+      }
+    } catch (e) {
+      alert("EXCEÇÃO NO PROCESSO DE UPLOAD: " + e);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   return (
