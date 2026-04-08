@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Upload from './pages/Upload';
-import Explore from './pages/Explore';
+import MyDrive from './pages/MyDrive';
 import Footer from './components/Footer';
 import { Toaster } from 'sonner';
 
@@ -14,9 +14,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/drive" element={<MyDrive />} />
             <Route path="/upload" element={<Upload />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/drive" replace />} />
           </Routes>
         </div>
         <Footer />
